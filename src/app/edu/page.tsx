@@ -60,7 +60,7 @@ function EducatorLoginContent() {
       const { error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?redirect_to=/edu`,
+          emailRedirectTo: `${process.env.SITE_BASE || window.location.origin}/auth/callback?redirect_to=/edu`,
         },
       });
 
