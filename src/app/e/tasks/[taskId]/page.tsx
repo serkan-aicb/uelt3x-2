@@ -333,7 +333,7 @@ export default function EducatorTaskDetail() {
       const applicantUsername = profileData?.username || null;
 
       // Insert assignment
-      const { error: assignError } = await supabase
+      const { data: assignmentData, error: assignError } = await supabase
         .from('task_assignments')
         .insert({
           task: taskId,
@@ -341,7 +341,9 @@ export default function EducatorTaskDetail() {
           assignee_username: applicantUsername,
           assigned_by: user.id,
           status: 'in_progress'
-        });
+        })
+        .select()
+        .single();
 
       if (assignError) throw assignError;
 
@@ -358,6 +360,23 @@ export default function EducatorTaskDetail() {
 
       // Remove this student from the local requests state so they disappear from the left list
       setRequests(prev => prev.filter(req => req.applicant !== applicantId));
+
+      // Add the new assignment to the local assignments state so it appears in the right list
+      if (assignmentData) {
+        // Fetch the profile data for the new assignment
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('username, did')
+          .eq('id', applicantId)
+          .single();
+        
+        const newAssignment: Assignment = {
+          ...assignmentData,
+          profiles: profileData || null
+        };
+        
+        setAssignments(prev => [...prev, newAssignment]);
+      }
 
       // If single, close task
       if (taskMode === 'single') {
@@ -377,7 +396,31 @@ export default function EducatorTaskDetail() {
       router.refresh();
     } catch (e: unknown) {
       console.error("Error assigning task:", e);
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      
+      // Extract a readable error message
+      let errorMessage = "An unknown error occurred";
+      
+      if (e instanceof Error) {
+        errorMessage = e.message;
+      } else if (typeof e === "object" && e !== null) {
+        // Try to extract message from object
+        const errorObj = e as {[key: string]: unknown};
+        if ("message" in errorObj && typeof errorObj.message === "string") {
+          errorMessage = errorObj.message;
+        } else if ("error" in errorObj && typeof errorObj.error === "string") {
+          errorMessage = errorObj.error;
+        } else {
+          // Try to stringify the object
+          try {
+            errorMessage = JSON.stringify(e);
+          } catch (stringifyError) {
+            errorMessage = "An unknown error occurred";
+          }
+        }
+      } else if (typeof e === "string") {
+        errorMessage = e;
+      }
+      
       setMessage(`Error assigning task: ${errorMessage}`);
       setTimeout(() => setMessage(""), 5000);
     }
@@ -406,7 +449,30 @@ export default function EducatorTaskDetail() {
       router.refresh();
     } catch (e: unknown) {
       console.error("Error unassigning:", e);
-      setMessage("Unexpected error.");
+      
+      // Extract a readable error message
+      let errorMessage = "An unknown error occurred";
+      
+      if (e instanceof Error) {
+        errorMessage = e.message;
+      } else if (typeof e === "object" && e !== null) {
+        const errorObj = e as {[key: string]: unknown};
+        if ("message" in errorObj && typeof errorObj.message === "string") {
+          errorMessage = errorObj.message;
+        } else if ("error" in errorObj && typeof errorObj.error === "string") {
+          errorMessage = errorObj.error;
+        } else {
+          try {
+            errorMessage = JSON.stringify(e);
+          } catch (stringifyError) {
+            errorMessage = "An unknown error occurred";
+          }
+        }
+      } else if (typeof e === "string") {
+        errorMessage = e;
+      }
+      
+      setMessage(`Error unassigning task: ${errorMessage}`);
       setTimeout(() => setMessage(""), 5000);
     }
   };
@@ -433,7 +499,30 @@ export default function EducatorTaskDetail() {
       router.refresh();
     } catch (e: unknown) {
       console.error("Unexpected error approving request:", e);
-      setMessage("Unexpected error.");
+      
+      // Extract a readable error message
+      let errorMessage = "An unknown error occurred";
+      
+      if (e instanceof Error) {
+        errorMessage = e.message;
+      } else if (typeof e === "object" && e !== null) {
+        const errorObj = e as {[key: string]: unknown};
+        if ("message" in errorObj && typeof errorObj.message === "string") {
+          errorMessage = errorObj.message;
+        } else if ("error" in errorObj && typeof errorObj.error === "string") {
+          errorMessage = errorObj.error;
+        } else {
+          try {
+            errorMessage = JSON.stringify(e);
+          } catch (stringifyError) {
+            errorMessage = "An unknown error occurred";
+          }
+        }
+      } else if (typeof e === "string") {
+        errorMessage = e;
+      }
+      
+      setMessage(`Error approving request: ${errorMessage}`);
       setTimeout(() => setMessage(""), 5000);
     }
   };
@@ -460,7 +549,30 @@ export default function EducatorTaskDetail() {
       router.refresh();
     } catch (e: unknown) {
       console.error("Unexpected error rejecting request:", e);
-      setMessage("Unexpected error.");
+      
+      // Extract a readable error message
+      let errorMessage = "An unknown error occurred";
+      
+      if (e instanceof Error) {
+        errorMessage = e.message;
+      } else if (typeof e === "object" && e !== null) {
+        const errorObj = e as {[key: string]: unknown};
+        if ("message" in errorObj && typeof errorObj.message === "string") {
+          errorMessage = errorObj.message;
+        } else if ("error" in errorObj && typeof errorObj.error === "string") {
+          errorMessage = errorObj.error;
+        } else {
+          try {
+            errorMessage = JSON.stringify(e);
+          } catch (stringifyError) {
+            errorMessage = "An unknown error occurred";
+          }
+        }
+      } else if (typeof e === "string") {
+        errorMessage = e;
+      }
+      
+      setMessage(`Error rejecting request: ${errorMessage}`);
       setTimeout(() => setMessage(""), 5000);
     }
   };
@@ -487,7 +599,30 @@ export default function EducatorTaskDetail() {
       router.refresh();
     } catch (e: unknown) {
       console.error("Unexpected error declining request:", e);
-      setMessage("Unexpected error.");
+      
+      // Extract a readable error message
+      let errorMessage = "An unknown error occurred";
+      
+      if (e instanceof Error) {
+        errorMessage = e.message;
+      } else if (typeof e === "object" && e !== null) {
+        const errorObj = e as {[key: string]: unknown};
+        if ("message" in errorObj && typeof errorObj.message === "string") {
+          errorMessage = errorObj.message;
+        } else if ("error" in errorObj && typeof errorObj.error === "string") {
+          errorMessage = errorObj.error;
+        } else {
+          try {
+            errorMessage = JSON.stringify(e);
+          } catch (stringifyError) {
+            errorMessage = "An unknown error occurred";
+          }
+        }
+      } else if (typeof e === "string") {
+        errorMessage = e;
+      }
+      
+      setMessage(`Error declining request: ${errorMessage}`);
       setTimeout(() => setMessage(""), 5000);
     }
   };
