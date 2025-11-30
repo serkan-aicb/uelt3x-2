@@ -46,6 +46,8 @@ src/
 
 If you encounter a 404 error after deployment, check the [TROUBLESHOOTING_404.md](TROUBLESHOOTING_404.md) file for detailed steps to diagnose and fix the issue.
 
+You can also visit the diagnosis page at `/diagnose` after deployment to get detailed information about the current state of your application.
+
 Common causes include:
 - Missing environment variables in Vercel
 - Database not properly configured
