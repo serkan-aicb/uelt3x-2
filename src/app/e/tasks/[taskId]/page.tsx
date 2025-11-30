@@ -339,6 +339,7 @@ export default function EducatorTaskDetail() {
           task: taskId,
           assignee: applicantId,
           assignee_username: applicantUsername,
+          assigned_by: user.id,
           status: 'in_progress'
         });
 
